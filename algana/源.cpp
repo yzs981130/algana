@@ -1,30 +1,62 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include <iostream> 
-#include <string>
-#include <vector>
-#include <algorithm>
+#include<iostream>
+#include<algorithm>
+#include<cstdio>
+#include<cstring>
+#define lowbit(x) (x&(-x))
 using namespace std;
+const int MAX = 500005;
+
+struct Data
+{
+	int id, w;
+}num[MAX];
+int n, ar[MAX];
+
+bool cmp(Data a, Data b)
+{
+	return a.w > b.w;
+}
+
+void add(int i)
+{
+	while (i <= n)
+	{
+		ar[i] += 1;
+		i += lowbit(i);
+	}
+}
+
+long long sum(int i)
+{
+	long long ans = 0;
+	while (i)
+	{
+		ans += ar[i];
+		i -= lowbit(i);
+	}
+	return ans;
+}
+
 int main()
 {
-	int n, m, t, c = 0;
-	cin >> n >> m;
-	vector<int>A, B;
-	for (int i = 0; i < n; i++)
+	int i;
+	while (scanf("%d", &n) && n)
 	{
-		cin >> t;
-		A.push_back(t);
+		memset(ar, 0, sizeof(ar));
+		for (i = 0; i < n; i++)
+		{
+			num[i].id = i + 1;
+			scanf("%d", &num[i].w);
+		}
+		sort(num, num + n, cmp);
+		long long ans = 0;
+		for (i = 0; i < n; i++)
+		{
+			ans += sum(num[i].id - 1);
+			add(num[i].id);
+		}
+		printf("%lld\n", ans);
 	}
-	for (int i = 0; i < m; i++)
-	{
-		cin >> t;
-		B.push_back(t);
-	}
-	A.resize(n);
-	B.resize(m);
-	sort(B.begin(), B.end());
-	for (int i = 0; i < n; i++)
-		c += binary_search(B.begin(), B.end(), A[i]);
-	cout << c << endl;
-	system("pause");
 	return 0;
 }
