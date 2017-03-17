@@ -2,61 +2,64 @@
 #include<iostream>
 #include<algorithm>
 #include<cstdio>
+#include<cmath>
 #include<cstring>
-#define lowbit(x) (x&(-x))
 using namespace std;
-const int MAX = 500005;
-
-struct Data
+#define MAXN 200010
+struct Point
 {
-	int id, w;
-}num[MAX];
-int n, ar[MAX];
-
-bool cmp(Data a, Data b)
-{
-	return a.w > b.w;
-}
-
-void add(int i)
-{
-	while (i <= n)
+	double x, y;
+	bool t;
+	void rotate(double r)
 	{
-		ar[i] += 1;
-		i += lowbit(i);
+		double X = x, Y = y; 
+		x = cos(r) * X + sin(r) * Y; 
+		y = cos(r) * Y - sin(r) * X;
 	}
+}p[MAXN];
+
+bool cmp(const Point &a,const Point &b)
+{
+	return a.x < b.x; 
+}
+double calc(const Point &a, const Point &b)
+{
+	return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 }
 
-long long sum(int i)
-{
-	long long ans = 0;
-	while (i)
-	{
-		ans += ar[i];
-		i -= lowbit(i);
-	}
-	return ans;
-}
 
 int main()
 {
-	int i;
-	while (scanf("%d", &n) && n)
+	int t;
+	cin >> t;
+	double rd = rand(); 
+	while(t--)
 	{
-		memset(ar, 0, sizeof(ar));
-		for (i = 0; i < n; i++)
-		{
-			num[i].id = i + 1;
-			scanf("%d", &num[i].w);
+		int n;
+		cin >> n;
+		memset(p, 0, sizeof(p));
+		for (int i = 0; i < n; i++)
+			scanf("%lf %lf", &p[i].x, &p[i].y);
+		for (int i = 0; i < n; i++)
+		{	
+			scanf("%lf %lf", &p[i + n].x, &p[i + n].y);
+			p[n + i].t = true;
 		}
-		sort(num, num + n, cmp);
-		long long ans = 0;
-		for (i = 0; i < n; i++)
-		{
-			ans += sum(num[i].id - 1);
-			add(num[i].id);
-		}
-		printf("%lld\n", ans);
+
+		for (int i = 0; i < 2 * n; ++i) p[i].rotate(rd);
+		sort(p, p + 2 * n, cmp);
+
+		double ans = 1e100 ; 
+		for(int i = 0 ; i < 2 * n ; ++ i)
+			for(int j = i + 1 ; j < 2 * n ; ++ j)
+			{
+				if (p[j].x - p[i].x > ans)
+					break; 
+				if (p[j].t ^ p[i].t)
+					ans = min(ans, calc(p[j], p[i]));
+			}
+		printf("%.3lf\n", ans);
 	}
+	system("pause");
 	return 0;
 }
